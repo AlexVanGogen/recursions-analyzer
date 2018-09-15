@@ -40,7 +40,7 @@ parameterDecl : variable COLON variableType;
 // Variables, constants and types
 variableType : NUMTYPE | BOOLTYPE;
 variable     : VAR;
-literal      : NUM | BOOL;
+literal      : NUM | TRUE | FALSE;
 
 // Whitespaces and comments
 WS : [ \t\r\n] -> skip;
@@ -93,6 +93,5 @@ ASSIGN : ':=';
 // Literals
 
 NUM             : ('+'|'-')?([0-9]+('.'[0-9]*)?)((('e'|'E')(('+'|'-')?)([0-9]+('.'[0-9]*)?)))?;
-BOOL            : TRUE | FALSE;
 
 VAR             : [_]*[a-z][a-z0-9_]* ;

@@ -9,16 +9,16 @@ statement : procedureDecl
           | IF LPAREN condition RPAREN THEN LBRACE trueBranch=statementList RBRACE
           | IF LPAREN condition RPAREN THEN LBRACE trueBranch=statementList RBRACE ELSE LBRACE falseBranch=statementList RBRACE
           | WHILE LPAREN condition RPAREN LBRACE loopBranch=statementList RBRACE
-          | VARDECL variable ASSIGN expression SEP
-          | variable ASSIGN expression SEP
-          | RETURN expression SEP
+          | VARDECL newVariable=variable ASSIGN expression SEP
+          | oldVariable=variable ASSIGN expression SEP
           | expression SEP;
 
 // Expressions
 condition returns [boolean value]: expression;
 
-expression : LPAREN expression RPAREN
+expression : LPAREN nestedExpression=expression RPAREN
            | variable
+           | literal
            | procedureCall
            | IF LPAREN condition RPAREN THEN trueBranch=expression ELSE falseBranch=expression
            | left=expression operator=(MUL | DIV | MOD) right=expression
@@ -28,7 +28,7 @@ expression : LPAREN expression RPAREN
            | left=expression operator=(AND | OR) right=expression;
 
 // Procedures and arguments
-procedureDecl : FUN functionName LPAREN declArgumentsList RPAREN (COLON variableType)? LBRACE statementList RBRACE;
+procedureDecl : FUN functionName LPAREN declArgumentsList RPAREN (COLON variableType)? LBRACE statementList (RETURN expression SEP)? RBRACE;
 procedureCall : functionName LPAREN callArgumentsList RPAREN;
 
 declArgumentsList : parameterDecl (COMMA parameterDecl)* | ;
@@ -40,6 +40,7 @@ parameterDecl : variable COLON variableType;
 // Variables, constants and types
 variableType : NUMTYPE | BOOLTYPE;
 variable     : VAR;
+literal      : NUM | BOOL;
 
 // Whitespaces and comments
 WS : [ \t\r\n] -> skip;

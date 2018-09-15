@@ -28,14 +28,14 @@ expression : LPAREN expression RPAREN
            | left=expression operator=(AND | OR) right=expression;
 
 // Procedures and arguments
-procedureDecl : FUN functionName LPAREN declArgumentsList RPAREN LBRACE statementList RBRACE;
+procedureDecl : FUN functionName LPAREN declArgumentsList RPAREN (COLON variableType)? LBRACE statementList RBRACE;
 procedureCall : functionName LPAREN callArgumentsList RPAREN;
 
 declArgumentsList : parameterDecl (COMMA parameterDecl)* | ;
 callArgumentsList : expression (COMMA expression)* | ;
 
 functionName : VAR;
-parameterDecl : variable COMMA variableType;
+parameterDecl : variable COLON variableType;
 
 // Variables, constants and types
 variableType : NUMTYPE | BOOLTYPE;

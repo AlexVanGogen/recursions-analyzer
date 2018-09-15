@@ -18,7 +18,7 @@ statement : procedureDecl
 condition returns [boolean value]: expression;
 
 expression : LPAREN expression RPAREN
-           | literal
+           | variable
            | procedureCall
            | IF LPAREN condition RPAREN THEN trueBranch=expression ELSE falseBranch=expression
            | left=expression operator=(MUL | DIV | MOD) right=expression
@@ -38,7 +38,6 @@ functionName : VAR;
 parameterDecl : variable COMMA variableType;
 
 // Variables, constants and types
-literal      : variable | variableType ;
 variableType : NUMTYPE | BOOLTYPE;
 variable     : VAR;
 

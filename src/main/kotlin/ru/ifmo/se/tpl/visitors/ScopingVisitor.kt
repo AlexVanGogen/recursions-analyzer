@@ -8,11 +8,13 @@ import ru.ifmo.se.tpl.scopes.Scope
 
 class ScopingVisitor: ASTVisitor() {
 
-    val topLevelScope = Scope()
+    private var currentScopeNumber = 0
 
-    val scopeStack = mutableListOf<Scope>()
-    val currentScope get() = scopeStack.last()
-    val wrappingScope get() = scopeStack.getOrNull(scopeStack.size - 2)
+    val topLevelScope = Scope(orderedNumber = currentScopeNumber++)
+
+    private val scopeStack = mutableListOf<Scope>()
+    private val currentScope get() = scopeStack.last()
+    private val wrappingScope get() = scopeStack.getOrNull(scopeStack.size - 2)
 
     override fun visitFile(file: Program) {
         scopeStack.add(topLevelScope)
@@ -38,7 +40,7 @@ class ScopingVisitor: ASTVisitor() {
     override fun visitConditionalStatement(statement: ConditionalStatement) {
         statement.condition.accept(this)
 
-        scopeStack.add(Scope(wrappingScope = currentScope))
+        scopeStack.add(Scope(wrappingScope = currentScope, orderedNumber = currentScopeNumber++))
         statement.branch.forEach { it.accept(this) }
         wrappingScope?.nestedScopes?.add(currentScope)
         scopeStack.remove(currentScope)
@@ -47,12 +49,12 @@ class ScopingVisitor: ASTVisitor() {
     override fun visitBranchingStatement(statement: BranchingStatement) {
         statement.condition.accept(this)
 
-        scopeStack.add(Scope(wrappingScope = currentScope))
+        scopeStack.add(Scope(wrappingScope = currentScope, orderedNumber = currentScopeNumber++))
         statement.trueBranch.forEach { it.accept(this) }
         wrappingScope?.nestedScopes?.add(currentScope)
         scopeStack.remove(currentScope)
 
-        scopeStack.add(Scope(wrappingScope = currentScope))
+        scopeStack.add(Scope(wrappingScope = currentScope, orderedNumber = currentScopeNumber++))
         statement.falseBranch.forEach { it.accept(this) }
         wrappingScope?.nestedScopes?.add(currentScope)
         scopeStack.remove(currentScope)
@@ -61,7 +63,7 @@ class ScopingVisitor: ASTVisitor() {
     override fun visitLoopStatement(statement: LoopStatement) {
         statement.condition.accept(this)
 
-        scopeStack.add(Scope(wrappingScope = currentScope))
+        scopeStack.add(Scope(wrappingScope = currentScope, orderedNumber = currentScopeNumber++))
         statement.loopBranch.map { it.accept(this) }
         wrappingScope?.nestedScopes?.add(currentScope)
         scopeStack.remove(currentScope)
@@ -121,12 +123,14 @@ class ScopingVisitor: ASTVisitor() {
     override fun visitSingleLiteralExpression(expression: SingleLiteralExpression) {}
 
     override fun visitProcedureDeclaration(declaration: ProcedureDeclaration) {
-//        if (declaration in currentScope)
-//            throw ProcedureAlreadyExistsException("Procedure already exists: ${declaration.name}(${declaration.parameters.map { it.type }})")
-        currentScope.proceduresTable.put(declaration.name, declaration.parameters.map { it.type })
+        if (declaration in currentScope)
+            throw ProcedureAlreadyExistsException("Procedure already exists: ${declaration.name}(${declaration.parameters.map { it.type.programRepresentation }})")
+        currentScope.proceduresTable.add(declaration)
 
-        scopeStack.add(Scope(wrappingScope = currentScope))
+        scopeStack.add(Scope(wrappingScope = currentScope, orderedNumber = currentScopeNumber++))
+        currentScope.variablesTable.putAll(declaration.parameters.map { Pair(it.name, it.type) })
         declaration.body.forEach { it.accept(this) }
+        declaration.returnExpression?.accept(this)
         wrappingScope?.nestedScopes?.add(currentScope)
         scopeStack.remove(currentScope)
     }
@@ -154,7 +158,7 @@ class ScopingVisitor: ASTVisitor() {
     }
 
     override fun visitVariableDeclaration(variableDeclaration: VariableDeclaration) {
-        if (variableDeclaration.name in currentScope)
+        if (variableDeclaration.name in currentScope.variablesTable)
             throw VariableAlreadyExistsException("Variable already defined: ${variableDeclaration.name}")
         currentScope.variablesTable.put(variableDeclaration.name, variableDeclaration.type)
     }

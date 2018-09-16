@@ -6,13 +6,19 @@ fun y(s: bool) {
 
     var p: num := 1;
     var l: num := 0;
+
+    fun y(s: num): num {
+        var p: num := 2 * s;
+        return if (p >= 2) then p else s;
+    }
+
     while (p >= 0) {
         l := p * 2;
-        p := p / 2;
+        p := p / x(p, y(l));
     }
 }
 
-var r: bool := true;
+var p: bool := true;
 
 fun z(x: num) {
     t();

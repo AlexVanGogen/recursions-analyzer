@@ -4,7 +4,7 @@ import ru.ifmo.se.tpl.ast.*
 
 class ASTRepresentationVisitor: ASTVisitor() {
 
-    var indentation = 1
+    var indentation = 0
 
     override fun visitFile(file: Program) {
         printWithIndent("Program")
@@ -14,8 +14,6 @@ class ASTRepresentationVisitor: ASTVisitor() {
     }
 
     override fun visitStatement(statement: Statement) {
-        printWithIndent("Statement")
-        indentation++
         when (statement) {
             is ProcedureDeclarationStatement -> visitProcedureDeclarationStatement(statement)
             is ConditionalStatement -> visitConditionalStatement(statement)
@@ -25,7 +23,6 @@ class ASTRepresentationVisitor: ASTVisitor() {
             is VariableAssignmentStatement -> visitVariableAssignmentStatement(statement)
             else -> visitSingleExpressionStatement(statement as SingleExpressionStatement)
         }
-        indentation--
     }
 
     override fun visitProcedureDeclarationStatement(statement: ProcedureDeclarationStatement) {
@@ -61,14 +58,14 @@ class ASTRepresentationVisitor: ASTVisitor() {
     }
 
     override fun visitVariableDeclarationStatement(statement: VariableDeclarationStatement) {
-        printWithIndent("Variable declaration")
+        printWithIndent("Variable declaration statement")
         indentation++
         statement.declaration.accept(this)
         indentation--
     }
 
     override fun visitVariableAssignmentStatement(statement: VariableAssignmentStatement) {
-        printWithIndent("Variable assignment")
+        printWithIndent("Variable assignment statement")
         indentation++
         visitVariable(statement.variable)
         statement.variableValue.accept(this)
@@ -90,8 +87,6 @@ class ASTRepresentationVisitor: ASTVisitor() {
     }
 
     override fun visitExpression(expression: Expression) {
-        printWithIndent("Expression")
-        indentation++
         when (expression) {
             is BinaryExpression -> visitBinaryExpression(expression)
             is BranchingExpression -> visitBranchingExpression(expression)
@@ -99,7 +94,6 @@ class ASTRepresentationVisitor: ASTVisitor() {
             is SingleVariableExpression -> visitSingleVariableExpression(expression)
             is SingleLiteralExpression -> visitSingleLiteralExpression(expression)
         }
-        indentation--
     }
 
     override fun visitReturnExpression(expression: Expression?) {
@@ -171,19 +165,13 @@ class ASTRepresentationVisitor: ASTVisitor() {
     }
 
     override fun visitDeclarationArgumentsList(declarationArgumentsList: List<ProcedureParameterDeclaration>) {
-        printWithIndent("Declaration arguments")
-        indentation++
         declarationArgumentsList.forEach {
             it.accept(this)
         }
-        indentation--
     }
 
     override fun visitCallArgumentsList(callArgumentsList: List<ProcedureCallArgument>) {
-        printWithIndent("Call arguments")
-        indentation++
         callArgumentsList.forEach { it.accept(this) }
-        indentation--
     }
 
     override fun visitCallArgument(callArgument: ProcedureCallArgument) {

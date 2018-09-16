@@ -4,7 +4,7 @@ import ru.ifmo.se.tpl.ast.*
 import ru.ifmo.se.tpl.graph.ProcedureCallGraph
 import ru.ifmo.se.tpl.scopes.Scope
 
-class ProcedureCallGraphMakingVisitor(val programScope: Scope): ASTVisitor() {
+class ProcedureCallGraphMakingVisitor(programScope: Scope): ASTVisitor() {
 
     private val calls: MutableList<Pair<ProcedureDeclaration, MutableList<ProcedureCall>>> = mutableListOf()
 
@@ -12,10 +12,11 @@ class ProcedureCallGraphMakingVisitor(val programScope: Scope): ASTVisitor() {
         programScope.addDeclarationsToGraph()
     }
 
-    fun makeProcedureCallGraph() = ProcedureCallGraph(calls)
+    fun makeProcedureCallGraph() = ProcedureCallGraph(calls, callToDeclarationMapping)
 
     private val nestedProceduresStack = mutableListOf<ProcedureDeclaration>()
     private val currentProcedureDeclaration get() = nestedProceduresStack.lastOrNull()
+    private val callToDeclarationMapping = mutableMapOf<ProcedureCall, ProcedureDeclaration>()
 
     private var currentScope = programScope
 
@@ -95,8 +96,7 @@ class ProcedureCallGraphMakingVisitor(val programScope: Scope): ASTVisitor() {
     }
 
     override fun visitReturnExpression(expression: Expression?) {
-        if (expression != null)
-            expression.accept(this)
+        expression?.accept(this)
     }
 
     override fun visitBinaryExpression(expression: BinaryExpression) {
@@ -128,7 +128,11 @@ class ProcedureCallGraphMakingVisitor(val programScope: Scope): ASTVisitor() {
     }
 
     override fun visitProcedureCall(call: ProcedureCall) {
-        calls.find { (declaration, _) -> currentProcedureDeclaration === declaration }?.second?.add(call)
+        val correspondingDeclarationAndNestedCalls = calls.find { (declaration, _) -> currentProcedureDeclaration === declaration }
+        if (correspondingDeclarationAndNestedCalls != null) {
+            correspondingDeclarationAndNestedCalls.second.add(call)
+            callToDeclarationMapping[call] = currentScope.findDeclarationFor(call)!!
+        }
         call.arguments.forEach { it.accept(this) }
     }
 

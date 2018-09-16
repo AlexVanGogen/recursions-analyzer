@@ -9,7 +9,10 @@ class ProcedureDeclaration(
         val body: List<Statement>,
         val returnExpression: Expression?
 ): AcceptableElement {
+
     override fun accept(visitor: ASTVisitor) {
         visitor.visitProcedureDeclaration(this)
     }
+
+    fun asType(): String = "$name${parameters.joinToString(",", "(", ")") { it.type.programRepresentation }}"
 }

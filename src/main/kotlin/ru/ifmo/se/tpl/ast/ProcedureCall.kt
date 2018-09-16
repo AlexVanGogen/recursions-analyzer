@@ -6,7 +6,10 @@ class ProcedureCall(
         val name: ProcedureName,
         val arguments: List<ProcedureCallArgument>
 ): AcceptableElement {
+
     override fun accept(visitor: ASTVisitor) {
         visitor.visitProcedureCall(this)
     }
+
+    fun asType(): String = "$name${arguments.joinToString(",", "(", ")") { it.value.type.programRepresentation }}"
 }

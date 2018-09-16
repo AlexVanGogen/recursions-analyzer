@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import ru.ifmo.se.tpl.antlr.ToylLexer
 import ru.ifmo.se.tpl.antlr.ToylParser
+import ru.ifmo.se.tpl.graph.RecursionsAnalyzer
 import ru.ifmo.se.tpl.visitors.ASTRepresentationVisitor
 import ru.ifmo.se.tpl.visitors.ProcedureCallGraphMakingVisitor
 import ru.ifmo.se.tpl.visitors.ScopingVisitor
@@ -31,7 +32,11 @@ fun main(args: Array<String>) {
         println("\n=== Procedure calls ===")
         val procedureCallGraphMakingVisitor = ProcedureCallGraphMakingVisitor(scopingVisitor.topLevelScope)
         program.accept(procedureCallGraphMakingVisitor)
-        procedureCallGraphMakingVisitor.makeProcedureCallGraph().print()
+        val graph = procedureCallGraphMakingVisitor.makeProcedureCallGraph()
+        graph.print()
+
+        println("\n=== Recursions analyzer ===")
+        RecursionsAnalyzer(graph).run()
 
     } catch (e: IndexOutOfBoundsException) {
         return

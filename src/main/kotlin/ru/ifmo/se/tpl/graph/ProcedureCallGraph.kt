@@ -4,10 +4,16 @@ import ru.ifmo.se.tpl.ast.ProcedureCall
 import ru.ifmo.se.tpl.ast.ProcedureDeclaration
 
 typealias CallsInsideProcedure = Pair<ProcedureDeclaration, List<ProcedureCall>>
+typealias CallToDeclarationMap = Map<ProcedureCall, ProcedureDeclaration>
 
 class ProcedureCallGraph(
-        val calls: List<CallsInsideProcedure>
+        val calls: List<CallsInsideProcedure>,
+        val callToDeclarationMapping: CallToDeclarationMap
 ) {
+
+    operator fun get(procedureDeclaration: ProcedureDeclaration) = calls.find { (declaration, _) -> declaration === procedureDeclaration }?.second
+    operator fun get(index: Int) = calls.getOrNull(0)
+
     fun print() {
         calls.forEach { (declaration, nestedCalls) ->
             println("${declaration.name}${declaration.parameters.map { it.type }} calls ${nestedCalls.map { it.name + it.arguments.map { a -> a.value.type } }}")

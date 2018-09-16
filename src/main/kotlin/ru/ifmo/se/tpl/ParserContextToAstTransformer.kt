@@ -138,8 +138,12 @@ class ParserContextToAstTransformer {
             transformParameterType(parameterDeclaration.variableType())
     )
 
-    fun transformParameterType(parameterType: ToylParser.VariableTypeContext): ParameterType =
-            if (parameterType.text == "num") ParameterType.NUM else ParameterType.BOOL
+    fun transformParameterType(parameterType: ToylParser.VariableTypeContext?): ParameterType =
+            when (parameterType?.text) {
+                "num" -> ParameterType.NUM
+                "bool" -> ParameterType.BOOL
+                else -> ParameterType.UNIT
+            }
 
     fun transformReturnParameterType(parameterType: ToylParser.VariableTypeContext?): ParameterType =
             if (parameterType == null) ParameterType.UNIT else transformParameterType(parameterType)

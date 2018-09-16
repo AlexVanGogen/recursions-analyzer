@@ -2,7 +2,7 @@ grammar Toyl;
 
 file : statementList;
 
-statementList : statement*;
+statementList : statement* | ;
 
 // Statements
 statement : procedureDecl
@@ -36,10 +36,10 @@ callArgumentsList : expression (COMMA expression)* | ;
 
 functionName : VAR;
 parameterDecl : variable COLON variableType;
-variableDecl : variable COLON variableType;
+variableDecl : variable (COLON variableType)?;
 
 // Variables, constants and types
-variableType : NUMTYPE | BOOLTYPE;
+variableType : NUMTYPE | BOOLTYPE | UNITTYPE;
 variable     : VAR;
 literal      : NUM | TRUE | FALSE;
 
@@ -61,6 +61,7 @@ FUN      : 'fun';
 VARDECL  : 'var';
 NUMTYPE  : 'num';
 BOOLTYPE : 'bool';
+UNITTYPE : 'unit';
 TRUE     : 'true';
 FALSE    : 'false';
 

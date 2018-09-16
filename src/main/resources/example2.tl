@@ -20,11 +20,19 @@ fun y(s: bool) {
 
 var p: bool := true;
 
+fun z(p: unit) {
+    z(t());
+}
+
 fun z(x: num) {
     t();
     return y(true);
 }
 
 fun t() {
-    return z(1);
+    var x := u(1);
+
+    fun u(i: num) { z(u(i)); }
+
+    return x;
 }

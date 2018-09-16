@@ -1,10 +1,21 @@
 package ru.ifmo.se.tpl.visitors
 
 import ru.ifmo.se.tpl.ast.*
-import ru.ifmo.se.tpl.exceptions.*
+import ru.ifmo.se.tpl.graph.ProcedureCallGraph
 import ru.ifmo.se.tpl.scopes.Scope
 
-class TypeCheckingVisitor(programScope: Scope): ASTVisitor() {
+class ProcedureCallGraphMakingVisitor(val programScope: Scope): ASTVisitor() {
+
+    private val calls: MutableList<Pair<ProcedureDeclaration, MutableList<ProcedureCall>>> = mutableListOf()
+
+    init {
+        programScope.addDeclarationsToGraph()
+    }
+
+    fun makeProcedureCallGraph() = ProcedureCallGraph(calls)
+
+    private val nestedProceduresStack = mutableListOf<ProcedureDeclaration>()
+    private val currentProcedureDeclaration get() = nestedProceduresStack.lastOrNull()
 
     private var currentScope = programScope
 
@@ -71,9 +82,6 @@ class TypeCheckingVisitor(programScope: Scope): ASTVisitor() {
 
     override fun visitCondition(condition: Condition) {
         condition.expression.accept(this)
-        if (condition.expression.type != ParameterType.BOOL) {
-            throw IncompatibleTypesException("Condition must have bool type; got ${condition.expression.typeToString()}")
-        }
     }
 
     override fun visitExpression(expression: Expression) {
@@ -94,70 +102,37 @@ class TypeCheckingVisitor(programScope: Scope): ASTVisitor() {
     override fun visitBinaryExpression(expression: BinaryExpression) {
         expression.left.accept(this)
         expression.right.accept(this)
-        when {
-            expression is LogicalExpression && expression.left.type != ParameterType.BOOL ->
-                throw ExpressionException("Left part must have type bool but it has type ${expression.left.typeToString()}")
-            expression is LogicalExpression && expression.right.type != ParameterType.BOOL ->
-                throw ExpressionException("Right part must have type bool but it has type ${expression.right.typeToString()}")
-            expression is ComparisonExpression && expression.right.type != ParameterType.NUM ->
-                throw ExpressionException("Left part must have type num but it has type ${expression.left.typeToString()}")
-            expression is ComparisonExpression && expression.right.type != ParameterType.NUM ->
-                throw ExpressionException("Right part must have type num but it has type ${expression.right.typeToString()}")
-            expression.type == ParameterType.NUM && expression.left.type != ParameterType.NUM ->
-                throw ExpressionException("Expression must have type num but left part has type ${expression.left.typeToString()}")
-            expression.type == ParameterType.NUM && expression.right.type != ParameterType.NUM ->
-                throw ExpressionException("Expression must have type num but right part has type ${expression.right.typeToString()}")
-        }
     }
 
     override fun visitBranchingExpression(expression: BranchingExpression) {
         expression.condition.accept(this)
         expression.trueBranch.accept(this)
         expression.falseBranch.accept(this)
-        if (expression.trueBranch.type != expression.falseBranch.type)
-            throw IncompatibleTypesException("Both branches of conditional expression must have the same type; got ${expression.trueBranch.typeToString()} and ${expression.falseBranch.typeToString()}")
-        expression.type = expression.trueBranch.type
     }
 
     override fun visitProcedureCallingExpression(expression: ProcedureCallingExpression) {
-        val call = expression.procedureCall
-        call.accept(this)
-        val appropriateDeclaration = currentScope.findDeclarationFor(expression.procedureCall) ?: throw ProcedureNotFoundException("Procedure not found: ${call.name}${call.arguments.map { it.value.type }}")
-        expression.type = appropriateDeclaration.returnType
+        expression.procedureCall.accept(this)
     }
 
-    override fun visitSingleVariableExpression(expression: SingleVariableExpression) {
-        visitVariable(expression.variable)
-        expression.type = currentScope[expression.variable]!!
-    }
+    override fun visitSingleVariableExpression(expression: SingleVariableExpression) {}
 
-    override fun visitSingleLiteralExpression(expression: SingleLiteralExpression) {
-        visitLiteral(expression.value)
-        expression.type = if (expression.value in arrayOf("true", "false")) ParameterType.BOOL else ParameterType.NUM
-    }
+    override fun visitSingleLiteralExpression(expression: SingleLiteralExpression) {}
 
     override fun visitProcedureDeclaration(declaration: ProcedureDeclaration) {
+        nestedProceduresStack.add(declaration)
         currentScope = currentScope.enterNext()
-        visitFunctionName(declaration.name)
-        visitDeclarationArgumentsList(declaration.parameters)
         declaration.body.forEach { it.accept(this) }
         declaration.returnExpression?.accept(this)
         currentScope = currentScope.up()
-        val returnExpressionType = declaration.returnExpression?.type ?: ParameterType.UNIT
-        if (returnExpressionType != declaration.returnType)
-            throw IncompatibleTypesException("Function declared as returning type ${returnExpressionType.programRepresentation} but returns ${declaration.returnType.programRepresentation}")
+        nestedProceduresStack.remove(declaration)
     }
 
     override fun visitProcedureCall(call: ProcedureCall) {
-        visitFunctionName(call.name)
-        visitCallArgumentsList(call.arguments)
+        calls.find { (declaration, _) -> currentProcedureDeclaration === declaration }?.second?.add(call)
+        call.arguments.forEach { it.accept(this) }
     }
 
-    override fun visitDeclarationArgumentsList(declarationArgumentsList: List<ProcedureParameterDeclaration>) {
-        declarationArgumentsList.forEach {
-            it.accept(this)
-        }
-    }
+    override fun visitDeclarationArgumentsList(declarationArgumentsList: List<ProcedureParameterDeclaration>) {}
 
     override fun visitCallArgumentsList(callArgumentsList: List<ProcedureCallArgument>) {
         callArgumentsList.forEach { it.accept(this) }
@@ -170,29 +145,18 @@ class TypeCheckingVisitor(programScope: Scope): ASTVisitor() {
     override fun visitFunctionName(functionName: ProcedureName) {}
 
     override fun visitVariableDeclaration(variableDeclaration: VariableDeclaration) {
-        visitVariable(variableDeclaration.name)
-        visitParameterType(variableDeclaration.type)
         variableDeclaration.value.accept(this)
-        if (variableDeclaration.type != variableDeclaration.value.type)
-            throw IncompatibleTypesException("Variable declared as ${variableDeclaration.type.programRepresentation}, but initializer has type ${variableDeclaration.value.type.programRepresentation}")
     }
 
-    override fun visitParameterDeclaration(parameterDeclaration: ProcedureParameterDeclaration) {
-        visitVariable(parameterDeclaration.name)
-        visitParameterType(parameterDeclaration.type)
-    }
+    override fun visitParameterDeclaration(parameterDeclaration: ProcedureParameterDeclaration) {}
 
-    override fun visitParameterType(parameterType: ParameterType) {
-    }
+    override fun visitParameterType(parameterType: ParameterType) {}
 
-    override fun visitReturnParameterType(parameterType: ParameterType?) {
-    }
+    override fun visitReturnParameterType(parameterType: ParameterType?) {}
 
-    override fun visitVariable(variable: VariableName) {
-    }
+    override fun visitVariable(variable: VariableName) {}
 
-    override fun visitLiteral(literal: LiteralValue) {
-    }
+    override fun visitLiteral(literal: LiteralValue) {}
 
     private var currentScopeNumber = 0
 
@@ -207,5 +171,8 @@ class TypeCheckingVisitor(programScope: Scope): ASTVisitor() {
 
     private fun Scope.up(): Scope = wrappingScope!!
 
-    private fun Expression.typeToString() = type.programRepresentation
+    private fun Scope.addDeclarationsToGraph() {
+        calls.addAll(proceduresTable.map { Pair(it, mutableListOf<ProcedureCall>()) })
+        nestedScopes.forEach { it.addDeclarationsToGraph() }
+    }
 }

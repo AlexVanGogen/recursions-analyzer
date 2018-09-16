@@ -118,6 +118,7 @@ class ASTRepresentationVisitor: ASTVisitor() {
         expression.left.accept(this)
         printWithIndent("Right expression")
         expression.right.accept(this)
+        indentation--
     }
 
     override fun visitBranchingExpression(expression: BranchingExpression) {

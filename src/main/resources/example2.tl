@@ -12,6 +12,8 @@ fun y(s: bool) {
     }
 }
 
+var r: bool := true;
+
 fun z(x: num) {
     t();
     return y(true);

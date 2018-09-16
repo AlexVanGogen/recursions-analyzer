@@ -13,6 +13,7 @@ fun y(s: bool) {
 }
 
 fun z(x: num) {
+    t();
     return y(true);
 }
 

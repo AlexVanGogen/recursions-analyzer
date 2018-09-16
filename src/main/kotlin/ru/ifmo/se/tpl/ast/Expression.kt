@@ -1,12 +1,22 @@
 package ru.ifmo.se.tpl.ast
 
-sealed class Expression
+import ru.ifmo.se.tpl.visitors.ASTVisitor
+
+sealed class Expression: AcceptableElement {
+    override fun accept(visitor: ASTVisitor) {
+        visitor.visitExpression(this)
+    }
+}
 
 sealed class BinaryExpression(
         open val left: Expression,
         open val operation: BinaryOperation,
         open val right: Expression
-): Expression()
+): Expression() {
+    override fun accept(visitor: ASTVisitor) {
+        visitor.visitBinaryExpression(this)
+    }
+}
 
 class MultiplicationExpression(
         override val left: Expression,
@@ -36,16 +46,32 @@ class BranchingExpression(
         val condition: Condition,
         val trueBranch: Expression,
         val falseBranch: Expression
-): Expression()
+): Expression() {
+    override fun accept(visitor: ASTVisitor) {
+        visitor.visitBranchingExpression(this)
+    }
+}
 
 class ProcedureCallingExpression(
         val procedureCall: ProcedureCall
-): Expression()
+): Expression() {
+    override fun accept(visitor: ASTVisitor) {
+        visitor.visitProcedureCallingExpression(this)
+    }
+}
 
 class SingleVariableExpression(
         val variable: VariableName
-): Expression()
+): Expression() {
+    override fun accept(visitor: ASTVisitor) {
+        visitor.visitSingleVariableExpression(this)
+    }
+}
 
 class SingleLiteralExpression(
         val value: LiteralValue
-): Expression()
+): Expression() {
+    override fun accept(visitor: ASTVisitor) {
+        visitor.visitSingleLiteralExpression(this)
+    }
+}

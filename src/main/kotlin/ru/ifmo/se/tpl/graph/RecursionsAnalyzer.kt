@@ -15,7 +15,7 @@ class RecursionsAnalyzer(
 
     private fun dfs(declaration: ProcedureDeclaration) {
         if (declaration in currentNestedProceduresStack) {
-            println("Recursion detected: ${representStack()} -> ${declaration.asType()}")
+            ProceduresRecursion(currentNestedProceduresStack, declaration).print()
             return
         }
         currentNestedProceduresStack.add(declaration)

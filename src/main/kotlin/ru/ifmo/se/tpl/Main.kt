@@ -4,6 +4,7 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import ru.ifmo.se.tpl.antlr.ToylLexer
 import ru.ifmo.se.tpl.antlr.ToylParser
+import ru.ifmo.se.tpl.exceptions.LanguageException
 import ru.ifmo.se.tpl.graph.RecursionsAnalyzer
 import ru.ifmo.se.tpl.visitors.ASTRepresentationVisitor
 import ru.ifmo.se.tpl.visitors.ProcedureCallGraphMakingVisitor
@@ -42,6 +43,12 @@ fun main(args: Array<String>) {
         return
     } catch (e: java.nio.file.NoSuchFileException) {
         println("${args[1]}: file not found")
+        return
+    } catch (e: LanguageException) {
+        println("Error: ${e.message}")
+        return
+    } catch (e: IllegalStateException) {
+        println("Error: ${e.message}")
         return
     }
 }

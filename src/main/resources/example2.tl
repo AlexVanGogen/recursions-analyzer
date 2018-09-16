@@ -36,3 +36,20 @@ fun t() {
 
     return x;
 }
+
+fun plus(x: num, y: num): num {
+    return x + y;
+}
+
+fun plus(x: bool, y: bool): bool {
+    return x || y;
+}
+
+fun branch() {
+    var z: num := plus(3, plus(1, 2));
+    if (z >= 5) then {
+        t();
+    } else {
+        y(plus(z < 3, z < 2));
+    }
+}

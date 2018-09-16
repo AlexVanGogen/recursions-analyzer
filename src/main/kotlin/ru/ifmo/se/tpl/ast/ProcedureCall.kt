@@ -11,5 +11,5 @@ class ProcedureCall(
         visitor.visitProcedureCall(this)
     }
 
-    fun asType(): String = "$name${arguments.joinToString(",", "(", ")") { it.value.type.programRepresentation }}"
+    fun asType(): String = "$name${arguments.joinToString(", ", "(", ")") { it.value.type.programRepresentation }}"
 }

@@ -124,7 +124,7 @@ class ScopingVisitor: ASTVisitor() {
 
     override fun visitProcedureDeclaration(declaration: ProcedureDeclaration) {
         if (declaration in currentScope)
-            throw ProcedureAlreadyExistsException("Procedure already exists: ${declaration.name}(${declaration.parameters.map { it.type.programRepresentation }})")
+            throw ProcedureAlreadyExistsException("Procedure already exists: ${declaration.asType()}")
         currentScope.proceduresTable.add(declaration)
 
         scopeStack.add(Scope(wrappingScope = currentScope, orderedNumber = currentScopeNumber++))

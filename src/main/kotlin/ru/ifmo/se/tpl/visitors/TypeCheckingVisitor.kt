@@ -122,7 +122,7 @@ class TypeCheckingVisitor(programScope: Scope): ASTVisitor() {
     override fun visitProcedureCallingExpression(expression: ProcedureCallingExpression) {
         val call = expression.procedureCall
         call.accept(this)
-        val appropriateDeclaration = currentScope.findDeclarationFor(expression.procedureCall) ?: throw ProcedureNotFoundException("Procedure not found: ${call.name}${call.arguments.map { it.value.type }}")
+        val appropriateDeclaration = currentScope.findDeclarationFor(expression.procedureCall) ?: throw ProcedureNotFoundException("Procedure not found: ${call.asType()}")
         expression.type = appropriateDeclaration.returnType
     }
 

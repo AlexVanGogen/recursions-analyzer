@@ -215,11 +215,11 @@ class ASTRepresentationVisitor: ASTVisitor() {
     }
 
     override fun visitParameterType(parameterType: ParameterType) {
-        printWithIndent("Type: $parameterType")
+        printWithIndent("Type: ${parameterType.programRepresentation}")
     }
 
     override fun visitReturnParameterType(parameterType: ParameterType?) {
-        printWithIndent("Type: $parameterType")
+        printWithIndent("Type: ${parameterType?.programRepresentation}")
     }
 
     override fun visitVariable(variable: VariableName) {

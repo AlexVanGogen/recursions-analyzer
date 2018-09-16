@@ -20,8 +20,8 @@ class Scope(
         } || (wrappingScope?.contains(procedureDeclaration) == true)
 
     fun print(indent: Int = 0) {
-        println("${"\t".repeat(indent)}Variables: [${variablesTable.entries.joinToString { (k, v) -> "$k: $v" }}]")
-        println("${"\t".repeat(indent)}Procedures: [${proceduresTable.joinToString { "${it.name}(${it.parameters.map { p -> p.type }})" }}]")
+        println("${"\t".repeat(indent)}Variables: [${variablesTable.entries.joinToString { (k, v) -> "$k: ${v.programRepresentation}" }}]")
+        println("${"\t".repeat(indent)}Procedures: [${proceduresTable.joinToString { it.asType() }}]")
         nestedScopes.forEach { it.print(indent + 1) }
     }
 

@@ -16,7 +16,7 @@ class ProcedureCallGraph(
 
     fun print() {
         calls.forEach { (declaration, nestedCalls) ->
-            println("${declaration.name}${declaration.parameters.map { it.type }} calls ${nestedCalls.map { it.name + it.arguments.map { a -> a.value.type } }}")
+            println("${declaration.asType()} calls ${nestedCalls.map { it.asType() }}")
         }
     }
 }

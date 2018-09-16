@@ -14,5 +14,5 @@ class ProcedureDeclaration(
         visitor.visitProcedureDeclaration(this)
     }
 
-    fun asType(): String = "$name${parameters.joinToString(",", "(", ")") { it.type.programRepresentation }}"
+    fun asType(): String = "$name${parameters.joinToString(", ", "(", ")") { it.type.programRepresentation }}"
 }

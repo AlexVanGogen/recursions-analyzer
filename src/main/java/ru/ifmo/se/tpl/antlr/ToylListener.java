@@ -118,6 +118,16 @@ public interface ToylListener extends ParseTreeListener {
 	 */
 	void exitParameterDecl(ToylParser.ParameterDeclContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ToylParser#variableDecl}.
+	 * @param ctx the parse tree
+	 */
+	void enterVariableDecl(ToylParser.VariableDeclContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ToylParser#variableDecl}.
+	 * @param ctx the parse tree
+	 */
+	void exitVariableDecl(ToylParser.VariableDeclContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ToylParser#variableType}.
 	 * @param ctx the parse tree
 	 */

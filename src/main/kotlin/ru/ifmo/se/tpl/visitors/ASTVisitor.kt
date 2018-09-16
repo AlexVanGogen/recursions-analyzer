@@ -50,6 +50,8 @@ abstract class ASTVisitor {
 
     abstract fun visitFunctionName(functionName: ProcedureName)
 
+    abstract fun visitVariableDeclaration(variableDeclaration: VariableDeclaration)
+
     abstract fun visitParameterDeclaration(parameterDeclaration: ProcedureParameterDeclaration)
 
     abstract fun visitParameterType(parameterType: ParameterType)

@@ -9,8 +9,8 @@ statement : procedureDecl
           | IF LPAREN condition RPAREN THEN LBRACE trueBranch=statementList RBRACE
           | IF LPAREN condition RPAREN THEN LBRACE trueBranch=statementList RBRACE ELSE LBRACE falseBranch=statementList RBRACE
           | WHILE LPAREN condition RPAREN LBRACE loopBranch=statementList RBRACE
-          | VARDECL newVariable=variable ASSIGN expression SEP
-          | oldVariable=variable ASSIGN expression SEP
+          | VARDECL variableDecl ASSIGN expression SEP
+          | variable ASSIGN expression SEP
           | expression SEP;
 
 // Expressions
@@ -36,6 +36,7 @@ callArgumentsList : expression (COMMA expression)* | ;
 
 functionName : VAR;
 parameterDecl : variable COLON variableType;
+variableDecl : variable COLON variableType;
 
 // Variables, constants and types
 variableType : NUMTYPE | BOOLTYPE;

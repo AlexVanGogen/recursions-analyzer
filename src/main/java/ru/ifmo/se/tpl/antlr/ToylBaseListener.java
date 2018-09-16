@@ -148,6 +148,18 @@ public class ToylBaseListener implements ToylListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterVariableDecl(ToylParser.VariableDeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitVariableDecl(ToylParser.VariableDeclContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterVariableType(ToylParser.VariableTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}

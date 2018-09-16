@@ -63,8 +63,7 @@ class ASTRepresentationVisitor: ASTVisitor() {
     override fun visitVariableDeclarationStatement(statement: VariableDeclarationStatement) {
         printWithIndent("Variable declaration")
         indentation++
-        visitVariable(statement.variable)
-        statement.variableValue.accept(this)
+        statement.declaration.accept(this)
         indentation--
     }
 
@@ -194,7 +193,7 @@ class ASTRepresentationVisitor: ASTVisitor() {
     }
 
     override fun visitFunctionName(functionName: ProcedureName) {
-        printWithIndent(functionName)
+        printWithIndent("Name: $functionName")
     }
 
     override fun visitParameterDeclaration(parameterDeclaration: ProcedureParameterDeclaration) {
@@ -205,20 +204,29 @@ class ASTRepresentationVisitor: ASTVisitor() {
         indentation--
     }
 
+    override fun visitVariableDeclaration(variableDeclaration: VariableDeclaration) {
+        printWithIndent("Variable declaration")
+        indentation++
+        visitVariable(variableDeclaration.name)
+        visitParameterType(variableDeclaration.type)
+        variableDeclaration.value.accept(this)
+        indentation--
+    }
+
     override fun visitParameterType(parameterType: ParameterType) {
-        printWithIndent(parameterType)
+        printWithIndent("Type: $parameterType")
     }
 
     override fun visitReturnParameterType(parameterType: ParameterType?) {
-        printWithIndent(parameterType)
+        printWithIndent("Type: $parameterType")
     }
 
     override fun visitVariable(variable: VariableName) {
-        printWithIndent(variable)
+        printWithIndent("Variable: $variable")
     }
 
     override fun visitLiteral(literal: LiteralValue) {
-        printWithIndent(literal)
+        printWithIndent("Value: $literal")
     }
 
     private fun printWithIndent(value: Any?) {

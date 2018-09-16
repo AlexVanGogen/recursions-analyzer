@@ -47,8 +47,7 @@ class LoopStatement(
 }
 
 class VariableDeclarationStatement(
-        val variable: VariableName,
-        val variableValue: Expression
+        val declaration: VariableDeclaration
 ): Statement() {
     override fun accept(visitor: ASTVisitor) {
         visitor.visitVariableDeclarationStatement(this)

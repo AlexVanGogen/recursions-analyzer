@@ -19,8 +19,8 @@ class ParserContextToAstTransformer {
             statement.condition() != null && statement.falseBranch == null && statement.loopBranch == null -> transformConditionalStatement(statement)
             statement.condition() != null && statement.falseBranch != null -> transformBranchingStatement(statement)
             statement.loopBranch != null -> transformLoopStatement(statement)
-            statement.newVariable != null -> transformVariableDeclarationStatement(statement)
-            statement.oldVariable != null -> transformVariableAssignmentStatement(statement)
+            statement.variableDecl() != null -> transformVariableDeclarationStatement(statement)
+            statement.variable() != null -> transformVariableAssignmentStatement(statement)
             else -> transformSingleExpressionStatement(statement)
         }
 
@@ -45,12 +45,17 @@ class ParserContextToAstTransformer {
     )
 
     fun transformVariableDeclarationStatement(statement: ToylParser.StatementContext) = VariableDeclarationStatement(
-            transformVariable(statement.newVariable),
-            transformExpression(statement.expression())
+            transformVariableDeclaration(statement.variableDecl(), statement.expression())
+    )
+
+    fun transformVariableDeclaration(variableDeclaration: ToylParser.VariableDeclContext, expression: ToylParser.ExpressionContext) = VariableDeclaration(
+            transformVariable(variableDeclaration.variable()),
+            transformParameterType(variableDeclaration.variableType()),
+            transformExpression(expression)
     )
 
     fun transformVariableAssignmentStatement(statement: ToylParser.StatementContext) = VariableAssignmentStatement(
-            transformVariable(statement.oldVariable),
+            transformVariable(statement.variable()),
             transformExpression(statement.expression())
     )
 
@@ -136,8 +141,8 @@ class ParserContextToAstTransformer {
     fun transformParameterType(parameterType: ToylParser.VariableTypeContext): ParameterType =
             if (parameterType.text == "num") ParameterType.NUM else ParameterType.BOOL
 
-    fun transformReturnParameterType(parameterType: ToylParser.VariableTypeContext?): ParameterType? =
-            if (parameterType == null) null else transformParameterType(parameterType)
+    fun transformReturnParameterType(parameterType: ToylParser.VariableTypeContext?): ParameterType =
+            if (parameterType == null) ParameterType.UNIT else transformParameterType(parameterType)
 
     fun transformVariable(variable: ToylParser.VariableContext): VariableName = variable.text
 

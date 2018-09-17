@@ -12,7 +12,7 @@ class ProcedureCallGraph(
 ) {
 
     operator fun get(procedureDeclaration: ProcedureDeclaration) = calls.find { (declaration, _) -> declaration === procedureDeclaration }?.second
-    operator fun get(index: Int) = calls.getOrNull(0)
+    operator fun get(index: Int) = calls.getOrNull(index)
 
     fun print() {
         calls.forEach { (declaration, nestedCalls) ->

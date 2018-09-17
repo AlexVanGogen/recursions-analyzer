@@ -5,11 +5,16 @@ plugins {
 group 'ru.ifmo.se.tpl'
 version '1.0-SNAPSHOT'
 
+apply plugin: 'antlr'
+apply plugin: 'application'
+mainClassName = "ru.ifmo.se.tpl.MainKt"
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    antlr "org.antlr:antlr4:4.7"
     compile "org.antlr:antlr4-runtime:4.7"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }

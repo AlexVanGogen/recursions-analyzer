@@ -17,29 +17,42 @@ class ParserFactory {
     }
 }
 
+fun help() {
+    println("Usage:")
+    println("\t-a <file> -- show AST of program")
+    println("\t-r <file> -- show (mutual)recursive procedures in program")
+}
+
 fun main(args: Array<String>) {
     try {
-        val parser = ParserFactory.fromFile(args[0])
+        val command = args[0]
+        val parser = ParserFactory.fromFile(args[1])
         val program = ParserContextToAstTransformer().transformFile(parser.file())
-        println("=== AST Representation ===")
-        program.accept(ASTRepresentationVisitor())
 
-        println("\n=== Visibility scopes ===")
-        val scopingVisitor = ScopingVisitor()
-        program.accept(scopingVisitor)
-        scopingVisitor.topLevelScope.print()
-        program.accept(TypeCheckingVisitor(scopingVisitor.topLevelScope))
-
-        println("\n=== Procedure calls ===")
-        val procedureCallGraphMakingVisitor = ProcedureCallGraphMakingVisitor(scopingVisitor.topLevelScope)
-        program.accept(procedureCallGraphMakingVisitor)
-        val graph = procedureCallGraphMakingVisitor.makeProcedureCallGraph()
-        graph.print()
-
-        println("\n=== Recursions analyzer ===")
-        RecursionsAnalyzer(graph).run()
+        when (command) {
+            "-a" -> program.accept(ASTRepresentationVisitor())
+            "-r" -> RecursionAnalyzerFacade().run(program)
+        }
+//        println("=== AST Representation ===")
+//        program.accept(ASTRepresentationVisitor())
+//
+//        println("\n=== Visibility scopes ===")
+//        val scopingVisitor = ScopingVisitor()
+//        program.accept(scopingVisitor)
+//        scopingVisitor.topLevelScope.print()
+//        program.accept(TypeCheckingVisitor(scopingVisitor.topLevelScope))
+//
+//        println("\n=== Procedure calls ===")
+//        val procedureCallGraphMakingVisitor = ProcedureCallGraphMakingVisitor(scopingVisitor.topLevelScope)
+//        program.accept(procedureCallGraphMakingVisitor)
+//        val graph = procedureCallGraphMakingVisitor.makeProcedureCallGraph()
+//        graph.print()
+//
+//        println("\n=== Recursions analyzer ===")
+//        RecursionsAnalyzer(graph).run()
 
     } catch (e: IndexOutOfBoundsException) {
+        help()
         return
     } catch (e: java.nio.file.NoSuchFileException) {
         println("${args[1]}: file not found")

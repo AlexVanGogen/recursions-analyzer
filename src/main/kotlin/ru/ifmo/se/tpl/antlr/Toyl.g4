@@ -46,7 +46,7 @@ literal      : NUM | TRUE | FALSE;
 // Whitespaces and comments
 WS : [ \t\r\n] -> skip;
 
-ONE_LINE_COMMENT : '//' ~[\r\n] -> skip;
+ONE_LINE_COMMENT : '//' ~[\r\n]* -> skip;
 
 MULTILINE_COMMENT: '/*' .*? '*/' -> skip;
 

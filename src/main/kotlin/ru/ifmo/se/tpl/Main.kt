@@ -33,23 +33,6 @@ fun main(args: Array<String>) {
             "-a" -> program.accept(ASTRepresentationVisitor())
             "-r" -> RecursionAnalyzerFacade().run(program)
         }
-//        println("=== AST Representation ===")
-//        program.accept(ASTRepresentationVisitor())
-//
-//        println("\n=== Visibility scopes ===")
-//        val scopingVisitor = ScopingVisitor()
-//        program.accept(scopingVisitor)
-//        scopingVisitor.topLevelScope.print()
-//        program.accept(TypeCheckingVisitor(scopingVisitor.topLevelScope))
-//
-//        println("\n=== Procedure calls ===")
-//        val procedureCallGraphMakingVisitor = ProcedureCallGraphMakingVisitor(scopingVisitor.topLevelScope)
-//        program.accept(procedureCallGraphMakingVisitor)
-//        val graph = procedureCallGraphMakingVisitor.makeProcedureCallGraph()
-//        graph.print()
-//
-//        println("\n=== Recursions analyzer ===")
-//        RecursionsAnalyzer(graph).run()
 
     } catch (e: IndexOutOfBoundsException) {
         help()

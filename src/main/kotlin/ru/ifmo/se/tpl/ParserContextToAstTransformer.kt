@@ -4,8 +4,6 @@ import ru.ifmo.se.tpl.antlr.ToylParser
 import ru.ifmo.se.tpl.ast.*
 import ru.ifmo.se.tpl.ast.ProcedureDeclaration
 import ru.ifmo.se.tpl.ast.BinaryOperation.*
-import ru.ifmo.se.tpl.exceptions.UnknownBinaryOperationException
-import kotlin.math.exp
 
 class ParserContextToAstTransformer {
 

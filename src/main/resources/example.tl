@@ -1,5 +1,5 @@
 fun x(b: num, c: num): num {
-    var d := b + c;
+    var d: num := b + c;
     return if (d <= b) then c else b;
 }
 

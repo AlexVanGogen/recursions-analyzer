@@ -136,6 +136,7 @@ class ScopingVisitor: ASTVisitor() {
     }
 
     override fun visitProcedureCall(call: ProcedureCall) {
+        call.arguments.forEach { it.accept(this) }
     }
 
     override fun visitDeclarationArgumentsList(declarationArgumentsList: List<ProcedureParameterDeclaration>) {
@@ -154,13 +155,13 @@ class ScopingVisitor: ASTVisitor() {
     override fun visitFunctionName(functionName: ProcedureName) {
     }
 
-    override fun visitParameterDeclaration(parameterDeclaration: ProcedureParameterDeclaration) {
-    }
+    override fun visitParameterDeclaration(parameterDeclaration: ProcedureParameterDeclaration) {}
 
     override fun visitVariableDeclaration(variableDeclaration: VariableDeclaration) {
         if (variableDeclaration.name in currentScope.variablesTable)
             throw VariableAlreadyExistsException("Variable already defined: ${variableDeclaration.name}")
-        currentScope.variablesTable.put(variableDeclaration.name, variableDeclaration.type)
+        currentScope.variablesTable[variableDeclaration.name] = variableDeclaration.type
+        variableDeclaration.value.accept(this)
     }
 
     override fun visitParameterType(parameterType: ParameterType) {

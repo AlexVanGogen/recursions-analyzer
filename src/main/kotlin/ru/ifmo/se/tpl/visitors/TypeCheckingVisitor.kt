@@ -104,9 +104,9 @@ class TypeCheckingVisitor(programScope: Scope): ASTVisitor() {
             expression is ComparisonExpression && expression.right.type != ParameterType.NUM ->
                 throw ExpressionException("Right part must have type num but it has type ${expression.right.typeToString()}")
             expression.type == ParameterType.NUM && expression.left.type != ParameterType.NUM ->
-                throw ExpressionException("Expression must have type num but left part has type ${expression.left.typeToString()}")
+                throw ExpressionException("Expression must have type num but the left part has type ${expression.left.typeToString()}")
             expression.type == ParameterType.NUM && expression.right.type != ParameterType.NUM ->
-                throw ExpressionException("Expression must have type num but right part has type ${expression.right.typeToString()}")
+                throw ExpressionException("Expression must have type num but the right part has type ${expression.right.typeToString()}")
         }
     }
 

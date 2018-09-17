@@ -1,0 +1,1 @@
+./build/install/recursions-analyzer/bin/recursions-analyzer $@
